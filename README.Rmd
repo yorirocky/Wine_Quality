@@ -1,0 +1,234 @@
+---
+title: "README"
+output: 
+  github_document:
+    pandoc_args: ["--wrap=none"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Hello! My name is Yoryi Roque, and I will be performing data analytics to conclude a hypothesis of whether or 
+not the percentage of alcohol directly affects the quality of a wine. I will be using 2 datasets, both with equal column names and characteristics, but for its respective wine type. 
+
+```{r}
+#Install packages
+# Please install required packages before knitting:
+# install.packages(c("ggplot2", "dplyr", "corrplot"))
+
+# Load red wine data
+redWineData = read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv", sep = ";")
+
+# Load white wine data
+whiteWineData = read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv", sep = ";")
+
+colnames(redWineData)
+colnames(whiteWineData)
+```
+
+For the usage of good red wine and white wine, there are important factors that make wine rich with quality,  
+but some of the most important values are as follows:  
+1. Alcohol: the higher quality the alcohol is, the better the quality is.  
+(12.5-15% for red and 10-13% for white)  
+2. Volative Acidity: Lower values work, but the higher the acidity, the more the wine tastes like vinegar  
+(<0.6 g/L for red, <0.4 g/L for white)  
+3. Sulphates: Medium to high sulfates preserves the wine and improves its stability  
+(0.5-0.8 g/L for red, 0.4-0.7 g/L for white)  
+4. Citric Acid: Makes it fresh, so it should aim around a medium value  
+(0.1-0.5 g/L for red, 0.2-0.6 g/L for white)  
+5. Residual Sugar: Should be balanced, since too little can make wine harsh, while too much can cloy the wine  
+(< 4 g/L = dry and > 35 g/L = sweet for red, < 3 g/L = dry and > 30 g/L = sweet for white)  
+6. pH / total Acidity: A good range of 3-4 pH is good for wine  
+(3.3-3.6 for red, 3.0-3.4 for white FOR pH)(6-10 g/L for red, 5-9 g/L for white FOR TOTAL acidity)  
+7. Sulfur Dioxide (Free and total): The right level prevents oxidation but too much causes off-flavors  
+(20-50 mg/L for red, 30-60 mg/L for white FOR FSulfur)(<150 mg/L for red, <200 mg/L for white FOR TSulfur)  
+8. Chlorides: Higher causes saltiness, lower usually means a better quality wine  
+(<0.1 g/L for red, <0.08 g/L for white)  
+
+Therefore, for good value wine, it's ideal to use the ranges as presented earlier, compare it to the ones   presented in both the red and white wine, and see if it falls under the right category according to the quality index from professionals as well.
+
+```{r}
+#Red wine evaluation
+
+# Number of samples (rows)
+num_samples_Red = nrow(redWineData)
+
+# Number of features (columns)
+num_features_Red = ncol(redWineData)
+
+# Feature names
+feature_names_Red = colnames(redWineData)
+
+# Data types
+feature_types_Red = sapply(redWineData, class)
+
+# Summary
+cat("Number of samples:", num_samples_Red, "\n")
+cat("Number of features:", num_features_Red, "\n\n")
+cat("Feature names and types:\n")
+print(data.frame(Feature_Red = feature_names_Red, Type = feature_types_Red))
+
+# Create a new data frame with measurement levels
+measurement_levels_Red <- c(
+  "fixed.acidity" = "Ratio",
+  "volatile.acidity" = "Ratio",
+  "citric.acid" = "Ratio",
+  "residual.sugar" = "Ratio",
+  "chlorides" = "Ratio",
+  "free.sulfur.dioxide" = "Ratio",
+  "total.sulfur.dioxide" = "Ratio",
+  "density" = "Ratio",
+  "pH" = "Interval",
+  "sulphates" = "Ratio",
+  "alcohol" = "Ratio",
+  "quality" = "Ordinal"  # since it's a score (0–10 scale)
+)
+
+# Combine with feature info
+info_df_Red = data.frame(
+  Feature_Red = names(measurement_levels_Red),
+  Type_Red = sapply(redWineData, class),
+  Measurement_Red = measurement_levels_Red
+)
+```
+
+All but the pH and quality measurements are ratios and pure numbers because they fit all the criteria of a ratio numeral. pH, while it is a number, does not have a true 0, nor can it be multiplied across with other values.
+
+```{r}
+print(info_df_Red)
+
+#Cleaning up the data
+
+# Check for missing values
+colSums(is.na(redWineData))
+colSums(is.na(whiteWineData))
+
+# Check for duplicates
+cat("Red wine duplicates:", sum(duplicated(redWineData)), "\n")
+cat("White wine duplicates:", sum(duplicated(whiteWineData)), "\n")
+
+#Removing dulplicates
+redWineData = redWineData[!duplicated(redWineData), ]  # Keeps only unique rows
+whiteWineData = whiteWineData[!duplicated(whiteWineData), ]
+
+# Add 'type' column
+redWineData$type = "red"
+whiteWineData$type = "white"
+
+# Combine datasets (like pd.concat)
+winesData = rbind(redWineData, whiteWineData)
+```
+
+In this step, I cleaned up the data by checking if any data was missing/ null within the data, which was not true. Because of that, I moved onto the next step which was to remove any data that was duplicated within the data, which was a lot more than I expected with numbers of 240 duplicated in the red wine and 937 in the white wine. I removed them to not have excessive data. Finally, I decided to make a dataset with the 2 values combined for comparisons to be done together.
+
+```{r}
+# Visualizations of the data to quality grading
+
+# Load necessary libraries
+library(tidyverse)
+library(ggplot2)
+library(GGally)  # For pair plots
+library(corrplot) # For correlation matrices
+
+# Basic structure
+glimpse(winesData)
+
+# Summary statistics
+summary(winesData)
+
+# Check quality distribution
+ggplot(winesData, aes(x = quality)) +
+  geom_histogram(binwidth = 1, fill = "skyblue") +
+  facet_wrap(~type) +
+  labs(title = "Distribution of Wine Quality Scores",
+       x = "Quality Score",
+       y = "Count")
+```
+
+This graph shows the number of quality scores there are compared to both the red and white wine datasets. This is after the code has been cleaned and duplicates have been removed. However, there is still a huge gap between the quantity of red and white wine, which may affect how certain relationships are formed.
+
+```{r}
+#correlation matrix of numeric features
+numericData = winesData %>% select_if(is.numeric)
+corMatrix = cor(numericData)
+corrplot(corMatrix, method = "color")
+```
+
+#To help with my research of exactly what factors make a good quality wine, this chart of the Pearsons 
+#Coefficients shows the negative and positive relationships with every possible value. What i wanted to measure #is the relationship between the Alcohol content and the quality of the wines according to the critic grading, #and see how positive/negative the relationship is.
+
+```{r}
+# Visualize (using corrplot)
+
+qualityCor = corMatrix[, "quality", drop = FALSE]  # Keeps it as a matrix
+
+corrplot(qualityCor, method = "color", 
+         title = "Correlations with Wine Quality",
+         mar = c(1, 1, 2, 1),
+         addCoef.col = "black",
+         cl.pos = 'n')  # Adjust margins for title
+```
+
+This chart gives more accurate numbers of the Pearsons coefficient, where we can see generally alcohol has a medium positive relationship with how good the quality of the wine is, and is the value with the strongest absolute value relation value (by that, alcohols 0.47 is the strongest correlation of either positive or negative of all the values)
+
+```{r}
+#Boxplot
+ggplot(winesData, aes(x = type, y = alcohol, fill = type)) + 
+  geom_boxplot() + 
+  labs(title = "Alcohol Content by Wine Type")
+```
+
+This box plot shows the amount of values that are located within the 2nd and 3rd Quadrant of the data, along with a few outliars as seen with the red wine data. This helps with showing the average amount of alcohol content is in each wine.
+
+```{r}
+#Hypothesis testing
+```
+
+For my hypothesis, as mentioned earlier, I want to showcase the correlation between alcohol and how a greater alcohol content concludes with better quality wine according to critical ratings. The null hypothesis would be there is zero correlation between the percentage of alcohol, positive or negative, with the quality of the wine while the alternative will be that there is a correlation between the alcohol and wine quality.
+
+```{r}
+# --- Red Wine Correlation Test ---
+corRed = cor.test(redWineData$alcohol, redWineData$quality)
+cat("Red Wine - Pearson r:", corRed$estimate, "| p-value:", corRed$p.value, "\n")
+
+# Plot for Red Wine
+p1 = ggplot(redWineData, aes(x = alcohol, y = quality)) +
+  geom_point(color = "darkred", alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  labs(
+    title = "Red Wine: Alcohol vs Quality",
+    subtitle = paste0("r = ", round(corRed$estimate, 3), 
+                      ", p = ", signif(corRed$p.value, 3)),
+    x = "Alcohol Content",
+    y = "Quality"
+  ) +
+  theme_minimal()
+
+# --- White Wine Correlation Test ---
+corWhite = cor.test(whiteWineData$alcohol, whiteWineData$quality)
+cat("White Wine - Pearson r:", corWhite$estimate, "| p-value:", corWhite$p.value, "\n")
+
+# Plot for White Wine
+p2 = ggplot(whiteWineData, aes(x = alcohol, y = quality)) +
+  geom_point(color = "gray40", alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  labs(
+    title = "White Wine: Alcohol vs Quality",
+    subtitle = paste0("r = ", round(corWhite$estimate, 3), 
+                      ", p = ", signif(corWhite$p.value, 3)),
+    x = "Alcohol Content",
+    y = "Quality"
+  ) +
+  theme_minimal()
+
+# Show plots side-by-side
+library(ggpubr)
+ggarrange(p1, p2, ncol = 2)
+```
+
+These 2 plots, side by side, shows the positive correlation between the 2 graphs with it's r statistic graph, 
+regression line and points at each of the qualities in comparison to that wines alcohol percentage. As seen by
+the line of best fit, the higher the percentage of alcohol, the better quality the alcohol is. Both red and 
+white wine statistics share extremely low p-values, which rejects the null hypothesis of there being zero 
+correlation between alcohol percentage and wine quality. The p-value for the white wine is significantly smaller because there is more values to make the statistic smaller. Therefore, it helps prove my hypothesis of alcohol's importance in wine.
