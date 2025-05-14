@@ -368,19 +368,19 @@ In this step, I cleaned up the data by checking if any data was missing/ null wi
     ##                    
     ## 
 
-![](README_files/figure-gfm/histogram-Of-both-Wines-1.png)<!-- -->
+<img src="figures/histogram-Of-both-Wines-1.png" style="display: block; margin: auto;" />
 
 This graph shows the number of quality scores there are compared to both the red and white wine datasets. This is after the code has been cleaned and duplicates have been removed. However, there is still a huge gap between the quantity of red and white wine, which may affect how certain relationships are formed.
 
-![](README_files/figure-gfm/complete-Correlation-Plot-1.png)<!-- -->
+<img src="figures/complete-Correlation-Plot-1.png" style="display: block; margin: auto;" />
 
 To help with my research of exactly what factors make a good quality wine, this chart of the Pearsons Coefficients shows the negative and positive relationships with every possible value. What i wanted to measure is the relationship between the Alcohol content and the quality of the wines according to the critic grading, and see how positive/negative the relationship is.
 
-![](README_files/figure-gfm/singlr-Correlation-Plot-1.png)<!-- -->
+<img src="figures/singlr-Correlation-Plot-1.png" style="display: block; margin: auto;" />
 
 This chart gives more accurate numbers of the Pearsons coefficient, where we can see generally alcohol has a medium positive relationship with how good the quality of the wine is, and is the value with the strongest absolute value relation value (by that, alcohols 0.47 is the strongest correlation of either positive or negative of all the values)
 
-![](README_files/figure-gfm/box-plot-of-Wine-Data-1.png)<!-- -->
+<img src="figures/box-plot-of-Wine-Data-1.png" style="display: block; margin: auto;" />
 
 This box plot shows the amount of values that are located within the 2nd and 3rd Quadrant of the data, along with a few outliars as seen with the red wine data. This helps with showing the average amount of alcohol content is in each wine.
 
@@ -392,7 +392,7 @@ For my hypothesis, as mentioned earlier, I want to showcase the correlation betw
 
     ## White Wine - Pearson r: 0.4628693 | p-value: 1.428531e-209
 
-![](README_files/figure-gfm/correlation-quality-alcohol-1.png)<!-- -->
+<img src="figures/correlation-quality-alcohol-1.png" style="display: block; margin: auto;" />
 
 These 2 plots, side by side, shows the positive correlation between the 2 graphs with it’s r statistic graph, regression line and points at each of the qualities in comparison to that wines alcohol percentage. As seen by the line of best fit, the higher the percentage of alcohol, the better quality the alcohol is. Both red and white wine statistics share extremely low p-values, which rejects the null hypothesis of there being zero correlation between alcohol percentage and wine quality. The p-value for the white wine is significantly smaller because there is more values to make the statistic smaller. Therefore, it helps prove my hypothesis of alcohol’s importance in wine.
 
@@ -438,25 +438,25 @@ These 2 plots, side by side, shows the positive correlation between the 2 graphs
 
 Now, to prove that the Pearsons Coefficient does signify some relationship, I need to run a linear model of the alcohol and quality data through a series of tests such as the linear regression test, multiple types of residual tests, and a unique Homoscedasticity test to prove its relation.
 
-![](README_files/figure-gfm/linear-regression-line-1.png)<!-- -->
+<img src="figures/linear-regression-line-1.png" style="display: block; margin: auto;" />
 
 The first test of linear regression modeling proves a linear relationship between the alcohol content and grading of quality of the wine. If the points were scattered more in a curve, we could disprove a straight correlation between the values and the Pearsons coefficient. This is not the cae because the model also displays a linear line with no need of multiple degrees of the evaluation to curve it.
 
 ### Q-Q plots
 
-![](README_files/figure-gfm/Q-Q-plots-1.png)<!-- -->
+<img src="figures/Q-Q-plots-1.png" style="display: block; margin: auto;" />
 
 Q-Q plots, or quantile to quantile plots, visually measures if the residuals of the alcohol & quality dataset line up with a normal distribution. Residuals themselves is the difference/error between the predicted value a data point based on the linear regression model vs where the actual point lies on the graph. Therefore, if more of the points line up with the normal distribution line, then the values can help clarify that the dataset is normally distributed. According to the line, it appears that most of the value are normally distributed, especially the bigger the percentage of alcohol becomes. Between the red and white wine, the white wine has values more normalized than the red wine because it’s points stray towards -2, not -3 as seen with the red wine, which strays away from a normal distribution argument.
 
 ### Histogram of residuals
 
-![](README_files/figure-gfm/histogram-of-residuals-1.png)<!-- -->
+<img src="figures/histogram-of-residuals-1.png" style="display: block; margin: auto;" />
 
 Viewing the histogram of the residuals give us an additional insight of how the data is oriented. As seen in both of the histograms, but more prominently in the red wine dataset, the majority of the information is between -1 and 1 residuals from their actual data point. However, the red wine dataset had a big amount of its data around -0.7 of a residual off from its original value. This may explain why, according to the Q-Q plot, the normal distribution of the red wine was wider than that of the white wine. Either way, since there is not a major quantity of skewing of the points, I can visually conclude that the residuals are not entirely far off from the line on the linear regression.
 
 ### Homoscedasticity check (residuals vs fitted)
 
-![](README_files/figure-gfm/homoscedasticity-1.png)<!-- -->
+<img src="figures/homoscedasticity-1.png" style="display: block; margin: auto;" />
 
 The homoscedasticity test/check presents a graph which should have the x line as the fitted values, or the values predicted by the linear model, and the y axis as the residuals of the red and white wine. The reason the points are jumpy is because of the quality values, which are ordinal and have no values in between. Based on the visualization, most of the data falls in between -1 and 1 residuals as compared to the fitted values. It aligns with the information presented with the residuals on the histogram, where a majority of the data points are not directly at zero, but relatively close to the sides of it. This means the residuals aren’t far off the points which help support there is a correlation between the points, and that relationship is positive.
 
